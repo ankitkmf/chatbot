@@ -20,6 +20,16 @@ $(document).ready(function() {
         recognition.start();
     });
 
+    $('.enterChat').on('keydown', function(e) {
+        if (e.which == 13 && $(this).val() != '') {
+            e.preventDefault();
+            var text = $(this).val();
+            addYourMessage(text);
+            socket.emit('chat message', text);
+            $(this).val('');
+        }
+    });
+
     $("#chatMessage").on("click", ".requestLink", function() {
         console.log("test" + $(this).text());
         addYourMessage($(this).text());
@@ -96,12 +106,14 @@ $(document).ready(function() {
     }
 
     var addYourMessage = (text) => {
+        updateScrollbar();
         $('<div class="message message-personal">' + text + '</div>').appendTo($('.mCSB_container')).addClass('new');
         updateScrollbar();
     }
 
     var validateMessage = (fulfillment) => {
         // console.log("1");
+        updateScrollbar();
         if (fulfillment.messages.length > 0) {
             var html = '';
             // console.log("2");
@@ -134,14 +146,14 @@ $(document).ready(function() {
 
     var addAgentMessage = (fulfillment) => {
         // $('<div class="message new"><figure class="avatar"><span><i class="fa fa-android"></i></span></figure>' + fulfillment + '</div>').appendTo($('.mCSB_container')).addClass('new');
-        return '<div><figure class="avatar"><span><i class="fa fa-android"></i></span></figure>' + fulfillment + '</div>';
-        //   updateScrollbar();
+        return '<div class="text"><figure class="avatar"><span><i class="fa fa-android"></i></span></figure>' + fulfillment + '</div>';
+        updateScrollbar();
     }
 
     var addAgentImage = (image) => {
         // $('<div class="message new"><img src=' + image + ' ></div>').appendTo($('.mCSB_container')).addClass('new');
         return '<img src=' + image + '>';
-        // updateScrollbar();
+        updateScrollbar();
     }
 
     var addAgentLinks = (replies) => {
@@ -150,10 +162,11 @@ $(document).ready(function() {
             var query = value;
             console.log(value);
             // console.log("replies:" + value)
-            allReplies += '</br><a class="link requestLink" data-id=' + query + '>' + query + '</a>';
+            allReplies += '</br><span class="badge badge-success"><a class="link requestLink" data-id=' + query + '>' + query + '</a></span>';
             //allReplies += '<label data-id=' + value + ' class="link requestLink" ' > +value + '</label>';
             //  $('<div class="message new link"><a href=sendRequest(' + query + ') >' + query + '</a></div>').appendTo($('.mCSB_container')).addClass('new');
         });
+        updateScrollbar();
         return allReplies;
         // updateScrollbar();
     }
